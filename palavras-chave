@@ -1,0 +1,82 @@
+<?php
+
+function file_get_contents_curl($url) {
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_HEADER, 0);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //Set curl to return the data instead of printing it to the browser.
+curl_setopt($ch, CURLOPT_URL, $url);
+$data = curl_exec($ch);
+curl_close($ch);
+return $data;
+}
+ // Check if the form is submitted
+
+
+$busca = $_GET['busca'];
+
+
+
+//echo $busca;
+$url = "https://http2.mlstatic.com/resources/sites/MLB/autosuggest?q=".$busca;
+$url = preg_replace("/ /", "%20", $url);
+echo $url;
+readfile("get.html");
+
+
+
+$content = file_get_contents_curl($url);
+
+$newcontent = json_encode($content);
+
+$arrayResultados = array();
+$resultado= array();
+$resultados = explode('"', $newcontent );
+foreach($resultados as $element)
+{
+array_push($arrayResultados,$element) ;
+    
+}
+
+
+foreach($arrayResultados as $v){
+
+//	if ( substr($v, 0, 1) =="c" ) { 
+
+
+if (in_array(substr($v, 0, 1), array("a", "b", "c"))) {
+		array_push($resultado,$v) ;
+
+	}
+    
+}
+
+
+
+
+
+
+
+print_r($arrayResultados);
+echo "<ul>";
+foreach ($resultado as $valor) {
+	$results = substr_replace($valor, "", -1);
+	$result=str_replace("u00f5","o",$results);
+	$result=str_replace("\u00e3o","ao",$result);
+	$result=str_replace("\u00e7","c",$result);
+	$result=str_replace("\o","o",$result);
+	$result=str_replace("\u00e3","o",$result);
+	$result=str_replace("\u00e9","e",$result);
+	
+	$link=str_replace("+","-",$result);
+   //  echo $link;
+	
+	echo '<a target="_self" href="http://topml.000webhostapp.com/get.php?busca='.$link.' " /><li style="display: inline-block; font-style:Arial; font-size: 18px; margin:6px;">'.
+	$result."</li></a>";
+}
+echo "</ul>";
+
+
+
+
+
+?>
